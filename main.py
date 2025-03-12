@@ -2,8 +2,7 @@ import copy
 import itertools
 
 INPUT_DIR = "inputs/"
-file_name = "0-demo.txt"
-
+file_name = "1-thunberg.txt"
 
 
 class Resource:
@@ -87,8 +86,6 @@ class PowerGrid:
         self.accumulator_storage = 0
         self.actions = []
 
-    
-
     def step_forward(self, selected_resources: list[int]):
         total_cost = sum(
             self.resource_types[resource_id].ra for resource_id in selected_resources
@@ -133,7 +130,7 @@ class PowerGrid:
                     profit_modifier += ressource.re
                 if ressource.rt == "E":
                     accumulator_capacity += ressource.re
-    
+
         for ressource_id in selected_resources:
             ressource = self.resource_types[ressource_id]
             if ressource.rt == "A":
@@ -146,8 +143,7 @@ class PowerGrid:
                 profit_modifier += ressource.re
             if ressource.rt == "E":
                 accumulator_capacity += ressource.re
-            
-        
+
         self.accumulator_storage = min(self.accumulator_storage, accumulator_capacity)
 
         # apply the limit to the modifiers
@@ -159,7 +155,6 @@ class PowerGrid:
             life_extension_modifier = 1
         if profit_modifier < 0:
             profit_modifier = 0
-
 
         current_action = []
         for resource_id in selected_resources:
@@ -213,9 +208,6 @@ class PowerGrid:
 
         self.current_turn += 1
         self.score += profit
-
-        print(self.score)
-
         return self.score
 
     def get_available_resources(self):
@@ -224,12 +216,7 @@ class PowerGrid:
             if resource.ra <= self.budget:
                 available_resources.append(copy.deepcopy(resource))
         return available_resources
-    
-    
-    
 
-    
-    
 
 def parse_input():
     with open(INPUT_DIR + file_name, "r") as f:
@@ -324,21 +311,23 @@ def main():
 
     starting_power_grid = PowerGrid(resources, turns, intitial_cap)
 
- 
-
     number_of_resources = len(resources)
-    all_possible_actions :list = []
-    for nn in range(1, number_of_resources +1):
-        all_possible_actions.extend(itertools.combinations(range(number_of_resources), nn))
+    all_possible_actions: list = []
+    for nn in range(1, number_of_resources + 1):
+        all_possible_actions.extend(
+            itertools.combinations(range(number_of_resources), nn)
+        )
 
     current_candidate = starting_power_grid
     for ii in range(len(turns)):
-        print(all_possible_actions)
-        best_action = max(all_possible_actions, key=lambda x: copy.deepcopy(current_candidate).step_forward(x))
+        best_action = max(
+            all_possible_actions,
+            key=lambda x: copy.deepcopy(current_candidate).step_forward(x),
+        )
         current_candidate.step_forward(best_action)
 
         print(current_candidate.score)
-    
+
     save_solution(current_candidate.actions, "output.txt")
 
 
