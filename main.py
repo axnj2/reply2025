@@ -214,12 +214,17 @@ class PowerGrid:
         self.current_turn += 1
         self.score += profit
 
+        print(self.score)
+
+        return self.score
+
     def get_available_resources(self):
         available_resources = []
         for resource in self.resource_types:
             if resource.ra <= self.budget:
                 available_resources.append(copy.deepcopy(resource))
         return available_resources
+    
     
     
 
@@ -317,18 +322,24 @@ def main():
         for resource in resources
     ]
 
-    power_grid = PowerGrid(resources, turns, intitial_cap)
+    starting_power_grid = PowerGrid(resources, turns, intitial_cap)
 
-    
+ 
 
     number_of_resources = len(resources)
+    all_possible_actions :list = []
+    for nn in range(1, number_of_resources +1):
+        all_possible_actions.extend(itertools.combinations(range(number_of_resources), nn))
 
+    current_candidate = starting_power_grid
+    for ii in range(len(turns)):
+        print(all_possible_actions)
+        best_action = max(all_possible_actions, key=lambda x: copy.deepcopy(current_candidate).step_forward(x))
+        current_candidate.step_forward(best_action)
 
-    for turn in turns:
-        
-        power_grid.step_forward()
-
-    print(power_grid.score)
+        print(current_candidate.score)
+    
+    save_solution(current_candidate.actions, "output.txt")
 
 
 main()
